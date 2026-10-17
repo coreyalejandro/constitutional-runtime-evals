@@ -27,9 +27,10 @@ before the new data exist.
 sentence as the constitution prompt but no specific rules), `constitution` (April).
 
 **Models.** Target: `claude-haiku-4-5` (replicates April). Primary judge: `claude-sonnet-4-6` (April judge).
-Second judge: an OpenAI model if an OpenAI API key is available, otherwise the newest Claude Opus model listed by
-the API at run time; whichever is used is recorded in the manifest and in `docs/LOG.md` before results are read.
+Second judge: chosen by the fixed rule in `scripts/pick_second_judge.py` (the newest full-size OpenAI GPT model if an
+OpenAI API key is available, otherwise the newest Claude Opus model); the choice is logged in `docs/LOG.md` before any result is read.
 Judges are run at temperature 0 (April used the API default; this is a deliberate change for reproducibility).
+If a model rejects a temperature setting, it runs at its default and this is recorded per call (`temperature_applied`).
 
 **Sampling.** Held-out: 3 samples per prompt and condition at temperature 1.0. Development: 1 sample (replication only).
 

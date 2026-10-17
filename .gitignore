@@ -4,3 +4,5 @@ __pycache__/
 runs_private/
 *.pyc
 .env
+results/smoke/
+results/junit.xml
