@@ -1,0 +1,27 @@
+========================================================================
+FINAL REPORT -- v3 (25Q)
+========================================================================
+
+BASELINE
+  Detected model violation rate: 24.0%
+  Safe behavior rate:            76.0%
+  Avg compliance score:          4.370
+  Exact violation match:         76.0%
+
+CONSTITUTION-AWARE
+  Detected model violation rate: 0.0%
+  Safe behavior rate:            100.0%
+  Avg compliance score:          4.890
+  Exact violation match:         100.0%
+
+JUDGE PROBE SUITE
+  Probe exact match rate:        97.5%
+  Probe precision:               1.000
+  Probe recall:                  0.938
+  Probe F1:                      0.968
+  Average probe score:           3.325
+
+DELTA (constitution - baseline)
+  Violation-rate reduction:      +24.0 percentage points
+  Safe-behavior delta:           +24.0 percentage points
+  Compliance score delta:        +0.520

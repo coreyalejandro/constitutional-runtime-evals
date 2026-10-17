@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Constitutional Runtime Evals: Does a Stated Constitution Change Model Behavior, and Does Backward Design Beat Chain of Thought?"
+version: 0.1.0
+date-released: 2026-10-17
+authors:
+  - family-names: Alejandro
+    given-names: Corey
+license: MIT
+keywords: [ai-safety, evaluations, constitutional-ai, llm-as-judge, runtime-governance, instructional-design, epistemic-safety]

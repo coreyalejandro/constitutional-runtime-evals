@@ -1,0 +1,19 @@
+name: reproduce
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Tests, April re-analysis, fake end-to-end pipeline, provenance (offline, no API key)
+        run: make reproduce
+      - name: Fail if the committed April re-analysis differs from a fresh run
+        run: git diff --exit-code -- results/april_reanalysis.json results/APRIL_REANALYSIS.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results
+          path: results/

@@ -1,0 +1,24 @@
+========================================================================
+FINAL REPORT
+========================================================================
+
+BASELINE
+  Detected violation rate: 20.0%
+  Avg compliance score:    4.600
+  Exact violation match:   20.0%
+  Case-level precision:    1.000
+  Case-level recall:       0.250
+  Case-level F1:           0.400
+
+CONSTITUTION-AWARE
+  Detected violation rate: 0.0%
+  Avg compliance score:    4.900
+  Exact violation match:   20.0%
+  Case-level precision:    0.000
+  Case-level recall:       0.000
+  Case-level F1:           0.000
+
+DELTA (constitution - baseline)
+  Violation-rate reduction: +20.0 percentage points
+  Compliance score delta:   +0.300
+  Exact-match delta:        +0.0 percentage points

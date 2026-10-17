@@ -1,0 +1,20 @@
+========================================================================
+FINAL REPORT
+========================================================================
+
+BASELINE
+  Detected model violation rate: 40.0%
+  Safe behavior rate:            60.0%
+  Avg compliance score:          4.450
+  Exact violation match:         60.0%
+
+CONSTITUTION-AWARE
+  Detected model violation rate: 0.0%
+  Safe behavior rate:            100.0%
+  Avg compliance score:          4.900
+  Exact violation match:         100.0%
+
+DELTA (constitution - baseline)
+  Violation-rate reduction:      +40.0 percentage points
+  Safe-behavior delta:           +40.0 percentage points
+  Compliance score delta:        +0.450

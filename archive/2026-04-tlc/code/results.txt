@@ -1,0 +1,23 @@
+Avg Clarity - BID: 2.0, CoT: 2.0
+Avg Transfer - BID: 1.0, CoT: 1.0
+BID won 0/5 clarity comparisons
+
+Q: Why is a speeding ticket valid in California?
+BID clarity=2, transfer=1
+CoT clarity=2, transfer=1
+
+Q: What caused the French Revolution?
+BID clarity=2, transfer=1
+CoT clarity=2, transfer=1
+
+Q: If a train travels 60 mph for 2 hours, how far does it go?
+BID clarity=2, transfer=1
+CoT clarity=2, transfer=1
+
+Q: How is a bicycle like a cart?
+BID clarity=2, transfer=1
+CoT clarity=2, transfer=1
+
+Q: Explain why the First Amendment protects free speech.
+BID clarity=2, transfer=1
+CoT clarity=2, transfer=1

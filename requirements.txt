@@ -1,0 +1,4 @@
+anthropic==1.15.0
+openai==3.33.0
+pytest==9.1.1
+pyyaml==6.0.3
