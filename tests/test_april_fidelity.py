@@ -12,6 +12,7 @@ def load_archived():
     if real is None:
         sys.modules["anthropic"] = types.ModuleType("anthropic"); sys.modules["anthropic"].Anthropic = object
     try:
+        sys.dont_write_bytecode = True  # keep the archive byte-identical
         spec = importlib.util.spec_from_file_location("april_harness", ARCHIVED)
         m = importlib.util.module_from_spec(spec); sys.modules["april_harness"] = m
         spec.loader.exec_module(m)

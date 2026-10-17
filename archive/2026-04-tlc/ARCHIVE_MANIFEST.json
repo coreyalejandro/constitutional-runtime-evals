@@ -8,7 +8,6 @@
   "copied_utc": "2026-10-17",
   "note": "Copied unchanged. Real API outputs from April 23-25, 2026 (target claude-haiku-4-5, judge claude-sonnet-4-6).",
   "files": {
-    "code/__pycache__/constitutional_ai_evaluator_edgecase_harness_v3_25q.cpython-313.pyc": "588320ff6b2dd7342c61adbe806471b30d973d632a47ebb98f0b182d4916f859",
     "code/bid_vs_cot.py": "d716b0c1bd2d4733f41fe8a1ee0569b058c026adffa910cf14e0718088004ba3",
     "code/constitutional_ai_evaluator_edgecase_harness_v2.py": "1e575627ff354cdb5ab7520b854f042fd732bd69d91db649aa481e2af4897587",
     "code/constitutional_ai_evaluator_edgecase_harness_v3.py": "ac7881a6d48af90e9fb781f215511ae65693abfc4c6df7ae5845149b16648ae9",

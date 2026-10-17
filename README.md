@@ -33,7 +33,7 @@ artifact and is not evidence either way.
 ## Reproduce
 
 ```bash
-make reproduce     # offline: 19 tests, April re-analysis, fake end-to-end pipeline, provenance. No API key, no cost.
+make reproduce     # offline: 20 tests, April re-analysis, fake end-to-end pipeline, provenance. No API key, no cost.
 ```
 
 Paid runs (pre-registered; resumable; a hard budget guard stops spending at `MAX_USD`):
