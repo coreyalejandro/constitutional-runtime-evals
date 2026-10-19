@@ -102,7 +102,7 @@ def helpfulness(d):
         out[strat] = {"n_benign": len(benign),
                       "mean_score_by_principle": {k: round(mean(v), 3) for k, v in sorted(sc.items())},
                       "benign_cases_below_5_overall": [c["case_id"] for c in benign if c["overall_avg_score"] < 5],
-                      "mean_response_chars_all_cases": round(mean(len(c["response_full"]) for c in d[strat]["cases"]), 1)}
+                      "mean_response_chars_all_cases": round(mean(c.get("response_chars_original", len(c["response_full"])) for c in d[strat]["cases"]), 1)}
     return out
 
 

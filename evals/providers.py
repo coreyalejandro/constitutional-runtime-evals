@@ -2,12 +2,19 @@
 
 complete(model, system, user, max_tokens, temperature, json_schema=None) -> Completion
 
-API keys are read from the environment only (ANTHROPIC_API_KEY, OPENAI_API_KEY). They are never
-printed, logged or written to disk.
+API keys are read from the environment only (ANTHROPIC_API_KEY, OPENAI_API_KEY) by the active harness.
+Error text is passed through evals.common.sanitize() before it is returned, so anything shaped like a key
+is removed before it can reach a log or result file.
+
+Retries: a request is re-sent here only when the provider REJECTED it without processing it (HTTP 429, 503,
+529), which is not billed. Timeouts and connection errors are NOT retried here, because a timed-out request
+can still be billed; the runner retries those as new attempts, each with its own budget reservation.
 """
 from __future__ import annotations
 
 import hashlib, json, os, random, time
+
+from evals.common import sanitize
 from dataclasses import dataclass, asdict
 
 
@@ -25,17 +32,37 @@ class Completion:
         return asdict(self)
 
 
-def _retry(fn, tries=6):
-    last = None
+_UNBILLED_REJECTIONS = (429, 503, 529)
+
+
+class SendError(Exception):
+    def __init__(self, err, sends):
+        super().__init__(str(err))
+        self.err, self.sends = err, sends
+
+
+def _retry(fn, tries=8):
+    """Returns (response, sends). Raises SendError(original exception, sends) on failure."""
+    sends = 0
     for a in range(tries):
+        sends += 1
         try:
-            return fn(), a + 1
-        except Exception as e:  # network, rate limit, overload
-            last = e
-            if getattr(e, "status_code", None) in (400, 401, 403, 404, 422):  # caller errors: retrying will not help
-                break
-            time.sleep(min(60, 2 ** a + random.random()))
-    raise last
+            return fn(), sends
+        except Exception as e:
+            if getattr(e, "status_code", None) in _UNBILLED_REJECTIONS and a < tries - 1:
+                time.sleep(min(60, 2 ** a + random.random()))
+                continue
+            raise SendError(e, sends)
+    raise SendError(RuntimeError("retries exhausted"), sends)
+
+
+def _err(e):
+    inner = e.err if isinstance(e, SendError) else e
+    return sanitize(f"{type(inner).__name__}: {str(inner)[:300]}")
+
+
+def _sends(e):
+    return e.sends if isinstance(e, SendError) else 1
 
 
 class AnthropicProvider:
@@ -51,7 +78,7 @@ class AnthropicProvider:
         try:
             return sorted(m.id for m in self.client.models.list(limit=100))
         except Exception as e:
-            return [f"<list failed: {type(e).__name__}>"]
+            return [f"<list failed: {type(e).__name__}>"]  # resolve_models() fails closed on this
 
     def complete(self, model, system, user, max_tokens, temperature, json_schema=None):
         kw = dict(model=model, system=system, messages=[{"role": "user", "content": user}], max_tokens=max_tokens)
@@ -62,15 +89,15 @@ class AnthropicProvider:
             kw["extra_body"] = {"temperature": temperature}; applied = True
         try:
             r, n = _retry(lambda: self.client.messages.create(**kw))
-        except Exception as e:
-            if applied and "temperature" in str(e).lower():
+        except SendError as e:
+            if applied and "temperature" in str(e.err).lower() and getattr(e.err, "status_code", None) == 400:
                 kw.pop("extra_body"); applied = False
                 try:
-                    r, n = _retry(lambda: self.client.messages.create(**kw))
-                except Exception as e2:
-                    return Completion("", None, 0, 0, f"{type(e2).__name__}: {str(e2)[:300]}", 6)
+                    r, n2 = _retry(lambda: self.client.messages.create(**kw)); n = e.sends + n2
+                except SendError as e2:
+                    return Completion("", None, 0, 0, _err(e2), e.sends + e2.sends)
             else:
-                return Completion("", None, 0, 0, f"{type(e).__name__}: {str(e)[:300]}", 6)
+                return Completion("", None, 0, 0, _err(e), e.sends)
         text = "\n".join(b.text for b in r.content if getattr(b, "type", None) == "text").strip()
         return Completion(text, r.stop_reason, r.usage.input_tokens, r.usage.output_tokens, None, n, applied)
 
@@ -88,7 +115,7 @@ class OpenAIProvider:
         try:
             return sorted(m.id for m in self.client.models.list())
         except Exception as e:
-            return [f"<list failed: {type(e).__name__}>"]
+            return [f"<list failed: {type(e).__name__}>"]  # resolve_models() fails closed on this
 
     def complete(self, model, system, user, max_tokens, temperature, json_schema=None):
         kw = dict(model=model, messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
@@ -100,15 +127,15 @@ class OpenAIProvider:
             kw["response_format"] = {"type": "json_schema", "json_schema": {"name": "judgment", "schema": json_schema, "strict": True}}
         try:
             r, n = _retry(lambda: self.client.chat.completions.create(**kw))
-        except Exception as e:
-            if "temperature" in str(e).lower() and "temperature" in kw:  # some reasoning models fix temperature
-                kw.pop("temperature"); applied = False
+        except SendError as e:
+            if "temperature" in str(e.err).lower() and "temperature" in kw and getattr(e.err, "status_code", None) == 400:
+                kw.pop("temperature"); applied = False  # some reasoning models fix temperature
                 try:
-                    r, n = _retry(lambda: self.client.chat.completions.create(**kw))
-                except Exception as e2:
-                    return Completion("", None, 0, 0, f"{type(e2).__name__}: {str(e2)[:300]}", 6)
+                    r, n2 = _retry(lambda: self.client.chat.completions.create(**kw)); n = e.sends + n2
+                except SendError as e2:
+                    return Completion("", None, 0, 0, _err(e2), e.sends + e2.sends)
             else:
-                return Completion("", None, 0, 0, f"{type(e).__name__}: {str(e)[:300]}", 6)
+                return Completion("", None, 0, 0, _err(e), e.sends)
         c = r.choices[0]
         return Completion((c.message.content or "").strip(), c.finish_reason, r.usage.prompt_tokens, r.usage.completion_tokens, None, n, applied)
 

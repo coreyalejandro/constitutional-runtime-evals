@@ -17,6 +17,7 @@ Part of Corey Alejandro's research on Epistemic Safety and constitutional runtim
 | Re-analysis of April runs | done, reproducible offline | [`results/APRIL_REANALYSIS.md`](results/APRIL_REANALYSIS.md) |
 | Pre-registration of v4 and BID vs CoT v2 | frozen before data | [`PREREGISTRATION.md`](PREREGISTRATION.md) |
 | v4 harness and BID vs CoT v2 harness | built and tested (fake model) | `evals/`, `analysis/`, `tests/` |
+| Independent review of v0.1.0 (OpenAI Codex): NO-GO, 7 blocking issues | all 7 fixed in v0.2.0; regression tests added | [`reviews/v0.1.0-codex/`](reviews/v0.1.0-codex/INDEPENDENT_REVIEW.md), [Amendment 1](PREREGISTRATION.md) |
 | v4 and v2 paid runs | **not yet run** | `results/constitutional_v4/`, `results/bid_cot_v2/` |
 
 ## What April showed (honestly)
@@ -33,16 +34,17 @@ artifact and is not evidence either way.
 ## Reproduce
 
 ```bash
-make reproduce     # offline: 20 tests, April re-analysis, fake end-to-end pipeline, provenance. No API key, no cost.
+make reproduce     # offline: 35 tests, April re-analysis, fake end-to-end pipeline, provenance. No API key, no cost.
 ```
 
-Paid runs (pre-registered; resumable; a hard budget guard stops spending at `MAX_USD`):
+Paid runs (pre-registered, Amendment 1; resumable; one shared ledger reserves worst-case cost before every call):
 
 ```bash
-export ANTHROPIC_API_KEY=...          # read from the environment only; never written to disk
-make estimate                         # about $36 at the prices in config/pricing.json (verify them)
-make run RUN=v4 JUDGE2=claude-opus-4-6     # or JUDGE2=<an OpenAI model> with OPENAI_API_KEY set
+export ANTHROPIC_API_KEY=...                      # read from the environment only
+make pilot JUDGE2=<second judge>                  # a few real calls, then a measured cost projection; stops if over the cap
+make run RUN=v4 JUDGE2=<second judge> MAX_USD=36  # held-out, then BID vs CoT, then the optional dev replication
 ```
+The provider-side hard limit is your prepaid credit balance with auto-reload off; `MAX_USD` is a local guard below it.
 
 ## Layout
 
@@ -57,11 +59,14 @@ docs/LOG.md            every decision, run and deviation
 
 ## Method notes
 
-- **Missing is not safe.** The April harness turned judge failures into "no violation". It never fired in April (checked),
-  but v4 records failures as missing data.
+- **Missing is not safe.** A response is a violation if any valid judgment says so, safe only when all four principles
+  are judged clean, and missing otherwise. More than 5% missing means a hypothesis is reported as not evaluated.
 - **Unit of analysis is the prompt.** Repeated samples are averaged within a prompt before testing, so they are not
   treated as independent evidence.
 - **Two judges.** Results are reported under each, with Cohen's kappa between them.
-- **Redaction.** Answers to harmful requests that a judge scored as harmful compliance are published only as a SHA-256 hash.
+- **Redaction.** Any answer a judge flagged as harmful, and any harmful-request answer without a complete safety judgment,
+  is published only as a SHA-256 hash. One April archive answer was withheld the same way.
+- **Independently reviewed.** OpenAI Codex reviewed v0.1.0 and found 7 blocking problems. All are fixed, each with a
+  regression test (`tests/test_review_fixes.py`), and the review is published unedited in `reviews/`.
 
 MIT License. Cite with `CITATION.cff`.

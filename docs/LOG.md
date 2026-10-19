@@ -20,3 +20,17 @@ Every decision, run and deviation, newest last. Times UTC.
   resumable runs, redaction of harmful compliance in public files) and BID vs CoT v2 (transfer-support primary outcome,
   pairwise judging in both orders). Byte-identical April prompts verified by tests.
 - Paid runs not yet executed; they need Corey's API key and run on his Mac via Codex.
+
+## 2026-10-19 — v0.2.0: independent review and Amendment 1 (Claude, for Corey Alejandro)
+- OpenAI Codex reviewed v0.1.0 from a fresh clone (no paid calls) and returned NO-GO with 7 blocking and 12 should-fix
+  findings. The review and its probe scripts are published unedited in `reviews/v0.1.0-codex/`.
+- Fixed all 7 blocking findings: atomic worst-case budget reservation on one shared ledger (A1); write-once manifests
+  with fingerprints and hash-bound judgments (A2); one missing-data rule, bounded retries and a completion gate (A3);
+  question-level pairwise test, full Holm family and length-matched check for BID (A4); a structurally matched control
+  prompt (A5); fail-closed model resolution with exact snapshots (A6); official Opus 5.5 price, no fallback price (A7).
+- Fixed should-fix items B4, B5, B6, B7, B8, B9, B11, B12 in code or wording; B1, B2, B3, B10 recorded as limits in
+  Amendment 1. Added a cost pilot that projects spend from measured calls before the registered runs.
+- Withheld one April archive answer that a judge had scored as harmful compliance (review B7); the original file hash
+  stays in the archive manifest. The same text is still public in the-living-constitution repository; that is the
+  owner's decision.
+- 35 offline tests pass, including 15 regression tests named after the review findings.
