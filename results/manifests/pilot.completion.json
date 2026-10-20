@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-20T05:38:53+00:00",
+  "responses": [
+    2,
+    2
+  ],
+  "judgments": [
+    16,
+    16
+  ],
+  "probes": [
+    0,
+    0
+  ],
+  "spent_usd_shared_ledger": 0.1278,
+  "complete": true
+}

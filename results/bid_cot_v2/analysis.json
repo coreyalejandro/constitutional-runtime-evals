@@ -1,0 +1,280 @@
+{
+  "run": "v4-bid",
+  "manifest": {
+    "created_utc": "2026-10-20T06:46:41+00:00",
+    "git_head": "0c25624b3f9629ea767040f2bad190e89e2dc6e0",
+    "fingerprint": "1957264403284f69d262cb8e94779102831a2e0cc41247e4abdece6c8b0b5726",
+    "config": {
+      "targets": "claude-haiku-4-5",
+      "judges": "claude-sonnet-4-6,claude-opus-5-5",
+      "samples": 2,
+      "temperature": 0.7,
+      "judge_temperature": 0.0,
+      "max_tokens": 1024,
+      "judge_max_tokens": 2048,
+      "limit": 0,
+      "experiment": "bid_vs_cot_v2",
+      "conditions": "plain,cot,bid"
+    },
+    "data_sha256": {
+      "data/bid_cot_questions.jsonl": "be747ec31cd0042a6b8e265b033c1330c08f4030de62a8f07be58155184ed652"
+    },
+    "resolved_models": {
+      "claude-haiku-4-5": "claude-haiku-4-5-20251001",
+      "claude-sonnet-4-6": "claude-sonnet-4-6",
+      "claude-opus-5-5": "claude-opus-5-5"
+    },
+    "pricing": {
+      "claude-haiku-4-5": {
+        "input": 1.0,
+        "output": 5.0
+      },
+      "claude-sonnet-4-6": {
+        "input": 3.0,
+        "output": 15.0
+      },
+      "claude-opus-5-5": {
+        "input": 4.0,
+        "output": 20.0
+      }
+    }
+  },
+  "is_fake": false,
+  "counts": {
+    "answers_expected": 180,
+    "answers_valid": 180,
+    "scores_valid": 960,
+    "scores_ignored_invalid_or_unbound": 0,
+    "answers_truncated": 0
+  },
+  "by_judge": {
+    "claude-sonnet-4-6": {
+      "primary": true,
+      "targets": {
+        "claude-haiku-4-5": {
+          "means": {
+            "transfer_support": {
+              "plain": 4.0833,
+              "cot": 4.2,
+              "bid": 4.1333
+            },
+            "clarity": {
+              "plain": 5,
+              "cot": 5,
+              "bid": 4.6667
+            },
+            "transferability": {
+              "plain": 4.2,
+              "cot": 4.2833,
+              "bid": 4.6333
+            },
+            "accuracy": {
+              "plain": 4.7833,
+              "cot": 4.8167,
+              "bid": 4.3833
+            }
+          },
+          "tests": {
+            "transfer_support": {
+              "bid_minus_cot": -0.0667,
+              "diff_95ci": [
+                -0.2167,
+                0.0833
+              ],
+              "perm_p_raw": 0.5309734513274337,
+              "n_questions": 30,
+              "role": "primary",
+              "perm_p_two_sided": 0.531,
+              "holm_p": null
+            },
+            "clarity": {
+              "bid_minus_cot": -0.3333,
+              "diff_95ci": [
+                -0.4667,
+                -0.2
+              ],
+              "perm_p_raw": 0.00024998750062496874,
+              "n_questions": 30,
+              "role": "secondary",
+              "perm_p_two_sided": 0.0002,
+              "holm_p": 0.0007
+            },
+            "transferability": {
+              "bid_minus_cot": 0.35,
+              "diff_95ci": [
+                0.1833,
+                0.5333
+              ],
+              "perm_p_raw": 0.0013499325033748313,
+              "n_questions": 30,
+              "role": "secondary",
+              "perm_p_two_sided": 0.0013,
+              "holm_p": 0.0013
+            },
+            "accuracy": {
+              "bid_minus_cot": -0.4333,
+              "diff_95ci": [
+                -0.6167,
+                -0.2667
+              ],
+              "perm_p_raw": 9.99950002499875e-05,
+              "n_questions": 30,
+              "role": "secondary",
+              "perm_p_two_sided": 0.0001,
+              "holm_p": 0.0004
+            }
+          },
+          "pairwise": {
+            "pairs_judged_both_orders": 60,
+            "order_consistent": 36,
+            "position_consistency_rate": 0.6,
+            "first_position_preference_rate": 0.6757,
+            "unit": "question",
+            "questions_judged": 30,
+            "bid_win_questions": 3,
+            "cot_win_questions": 20,
+            "tied_questions": 7,
+            "consistent_sample_pairs": {
+              "bid": 4,
+              "cot": 32,
+              "tie": 0
+            },
+            "perm_p_raw": 0.00048828125,
+            "sign_test_p": 0.0005,
+            "holm_p": 0.001
+          },
+          "length_matched_transfer_support": {
+            "rule": "mean BID and CoT output tokens within 20% for the question",
+            "n_questions": 24,
+            "bid_minus_cot": -0.0833,
+            "diff_95ci": [
+              -0.2708,
+              0.1042
+            ],
+            "perm_p_two_sided": 0.5134,
+            "role": "descriptive"
+          },
+          "mean_output_tokens": {
+            "cot": 355.4667,
+            "plain": 260.1667,
+            "bid": 410.1
+          }
+        }
+      }
+    },
+    "claude-opus-5-5": {
+      "primary": false,
+      "targets": {
+        "claude-haiku-4-5": {
+          "means": {
+            "transfer_support": {
+              "plain": 3.5167,
+              "cot": 3.6833,
+              "bid": 3.5167
+            },
+            "clarity": {
+              "plain": 4.8833,
+              "cot": 4.5167,
+              "bid": 3.4833
+            },
+            "transferability": {
+              "plain": 3.3667,
+              "cot": 3.35,
+              "bid": 3.4833
+            },
+            "accuracy": {
+              "plain": 4.25,
+              "cot": 4.2,
+              "bid": 3.7667
+            }
+          },
+          "tests": {
+            "transfer_support": {
+              "bid_minus_cot": -0.1667,
+              "diff_95ci": [
+                -0.3667,
+                0.0333
+              ],
+              "perm_p_raw": 0.16834158292085397,
+              "n_questions": 30,
+              "role": "primary",
+              "perm_p_two_sided": 0.1683,
+              "holm_p": null
+            },
+            "clarity": {
+              "bid_minus_cot": -1.0333,
+              "diff_95ci": [
+                -1.2333,
+                -0.8333
+              ],
+              "perm_p_raw": 4.999750012499375e-05,
+              "n_questions": 30,
+              "role": "secondary",
+              "perm_p_two_sided": 0.0,
+              "holm_p": 0.0002
+            },
+            "transferability": {
+              "bid_minus_cot": 0.1333,
+              "diff_95ci": [
+                0.0,
+                0.2833
+              ],
+              "perm_p_raw": 0.13654317284135795,
+              "n_questions": 30,
+              "role": "secondary",
+              "perm_p_two_sided": 0.1365,
+              "holm_p": 0.1365
+            },
+            "accuracy": {
+              "bid_minus_cot": -0.4333,
+              "diff_95ci": [
+                -0.6,
+                -0.2667
+              ],
+              "perm_p_raw": 9.99950002499875e-05,
+              "n_questions": 30,
+              "role": "secondary",
+              "perm_p_two_sided": 0.0001,
+              "holm_p": 0.0003
+            }
+          },
+          "pairwise": {
+            "pairs_judged_both_orders": 60,
+            "order_consistent": 54,
+            "position_consistency_rate": 0.9,
+            "first_position_preference_rate": 0.45,
+            "unit": "question",
+            "questions_judged": 30,
+            "bid_win_questions": 7,
+            "cot_win_questions": 18,
+            "tied_questions": 5,
+            "consistent_sample_pairs": {
+              "bid": 16,
+              "cot": 38,
+              "tie": 0
+            },
+            "perm_p_raw": 0.043285250663757324,
+            "sign_test_p": 0.0433,
+            "holm_p": 0.0866
+          },
+          "length_matched_transfer_support": {
+            "rule": "mean BID and CoT output tokens within 20% for the question",
+            "n_questions": 24,
+            "bid_minus_cot": -0.1042,
+            "diff_95ci": [
+              -0.3542,
+              0.125
+            ],
+            "perm_p_two_sided": 0.5009,
+            "role": "descriptive"
+          },
+          "mean_output_tokens": {
+            "cot": 355.4667,
+            "plain": 260.1667,
+            "bid": 410.1
+          }
+        }
+      }
+    }
+  }
+}

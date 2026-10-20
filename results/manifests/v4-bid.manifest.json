@@ -1,0 +1,82 @@
+{
+  "created_utc": "2026-10-20T06:46:41+00:00",
+  "git_head": "0c25624b3f9629ea767040f2bad190e89e2dc6e0",
+  "fingerprint": "1957264403284f69d262cb8e94779102831a2e0cc41247e4abdece6c8b0b5726",
+  "config": {
+    "targets": "claude-haiku-4-5",
+    "judges": "claude-sonnet-4-6,claude-opus-5-5",
+    "samples": 2,
+    "temperature": 0.7,
+    "judge_temperature": 0.0,
+    "max_tokens": 1024,
+    "judge_max_tokens": 2048,
+    "limit": 0,
+    "experiment": "bid_vs_cot_v2",
+    "conditions": "plain,cot,bid"
+  },
+  "data_sha256": {
+    "data/bid_cot_questions.jsonl": "be747ec31cd0042a6b8e265b033c1330c08f4030de62a8f07be58155184ed652"
+  },
+  "resolved_models": {
+    "claude-haiku-4-5": "claude-haiku-4-5-20251001",
+    "claude-sonnet-4-6": "claude-sonnet-4-6",
+    "claude-opus-5-5": "claude-opus-5-5"
+  },
+  "pricing": {
+    "claude-haiku-4-5": {
+      "input": 1.0,
+      "output": 5.0
+    },
+    "claude-sonnet-4-6": {
+      "input": 3.0,
+      "output": 15.0
+    },
+    "claude-opus-5-5": {
+      "input": 4.0,
+      "output": 20.0
+    }
+  },
+  "code_sha256": "449a82a01beeb13048f64196c7d40cd221734576179b38c5be2b3754a3c9dbaa",
+  "ledger": "runs_private/SPEND.jsonl",
+  "config_full": {
+    "name": "v4-bid",
+    "targets": "claude-haiku-4-5",
+    "judges": "claude-sonnet-4-6,claude-opus-5-5",
+    "require_judges": 2,
+    "samples": 2,
+    "temperature": 0.7,
+    "judge_temperature": 0.0,
+    "max_tokens": 1024,
+    "judge_max_tokens": 2048,
+    "workers": 4,
+    "max_usd": 55.0,
+    "ledger": "runs_private/SPEND.jsonl",
+    "limit": 0,
+    "outroot": "runs_private",
+    "seed": 0,
+    "experiment": "bid_vs_cot_v2",
+    "conditions": "plain,cot,bid"
+  },
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "available_models": {
+    "anthropic": [
+      "claude-fable-5",
+      "claude-fable-5-1",
+      "claude-haiku-4-5-20251001",
+      "claude-haiku-5-5",
+      "claude-opus-4-5-20251101",
+      "claude-opus-4-6",
+      "claude-opus-4-7",
+      "claude-opus-4-8",
+      "claude-opus-5",
+      "claude-opus-5-5",
+      "claude-sonnet-4-6",
+      "claude-sonnet-5",
+      "claude-sonnet-5-5"
+    ]
+  },
+  "packages": {
+    "anthropic": "1.15.0",
+    "openai": "3.33.0"
+  }
+}

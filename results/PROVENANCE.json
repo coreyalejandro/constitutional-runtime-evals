@@ -1,9 +1,9 @@
 {
-  "generated_utc": "2026-10-20T03:10:40+00:00",
-  "git_commit": "98f8aaee3d8cde58ba4a0032e5333b0ff433bf5d",
+  "generated_utc": "2026-10-20T07:16:56+00:00",
+  "git_commit": "0c25624b3f9629ea767040f2bad190e89e2dc6e0",
   "git_dirty": true,
   "python": "3.13.16",
-  "platform": "Linux-6.18.44-fc-v139-x86_64-with-glibc2.39",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
   "seeds": {
     "permutation_tests": 0,
     "bootstrap": 0
@@ -51,6 +51,26 @@
     "data/judge_probes_v3.json": "ab9206166932823b0aa93659f9ec0f032be0fe9a3288384f9940b03ca411315f",
     "requirements.txt": "cde8cd5764f5dd56fef851792419296b1bf6593379341e84df4b63f87035c4f9",
     "results/APRIL_REANALYSIS.md": "94e05e5ac2f67911a86c3c77629d4cbbc96b8eb391906fff2cb041f66f9ff80b",
-    "results/april_reanalysis.json": "b21c3d3874c1b8718f51bb1d555e344997c4d47d2fd3a20427fbd5fc185e6c4a"
+    "results/april_reanalysis.json": "b21c3d3874c1b8718f51bb1d555e344997c4d47d2fd3a20427fbd5fc185e6c4a",
+    "results/bid_cot_v2/RESULTS.md": "7de8fb52f7dc886239b100283c724d0af0fd502abfcb8431a3b0abcdef25b670",
+    "results/bid_cot_v2/analysis.json": "d2bf7e4e51c7d58cf8bb32dd79d02cad7edd15437358e7bdb07664917f0c29c9",
+    "results/bid_cot_v2/answers_public.jsonl": "a42811c717894db53ef0197686da7096411e579536b9ac633f97abf88ec68342",
+    "results/constitutional_v4/dev/RESULTS.md": "db1cc013079332aed8ce5246edbb73a6cbb4dced67f03b8e27e862e16c8fb0eb",
+    "results/constitutional_v4/dev/analysis.json": "e9cf16b7ee6d7caa584908551630a985088a7840951c54f26eae4aa39cfea5db",
+    "results/constitutional_v4/dev/responses_public.jsonl": "ce03b76eac91776f896bd6c80a5214062508b128b7bf5d51d583477fad5c788f",
+    "results/constitutional_v4/heldout/RESULTS.md": "3c2ec94f095f755942340d00919fee9dfa8a38e072537615cd5f302227c0f7de",
+    "results/constitutional_v4/heldout/analysis.json": "4bf0a0eb9793d524a25296c0036856ade7ff632cdf87362f502671199d11af7d",
+    "results/constitutional_v4/heldout/responses_public.jsonl": "71d53c6208b81a33bf40cb977f5e34006ae72fb27addd122ee03936aef879353",
+    "results/manifests/SPEND.jsonl": "52c06c8295f37df0edb98332cda3e2dd94df2b5caf79abf5f03424e87ba1e707",
+    "results/manifests/pilot-bid.completion.json": "3793e3fadb115df1026c91d3a283fc3ce746d657579eeb815225e834ee040e80",
+    "results/manifests/pilot-bid.manifest.json": "704ce52a210d17d80617411a10ec6650bb935fc8609ec464cd15fa25d1183fa8",
+    "results/manifests/pilot.completion.json": "6c373e25eaff806a9e81c8e406d45c539b26714fb88bf27cb8b4cb1d8d6e1306",
+    "results/manifests/pilot.manifest.json": "e2c6c3560b412f4a336ee301ebccfaf4616de16fa392a86095c5ca8fe09ff7e3",
+    "results/manifests/v4-bid.completion.json": "b7ccf2b1c1f70b307b412b1d298e9896b5231a0730e7eef279f3b0b0ae1734b1",
+    "results/manifests/v4-bid.manifest.json": "96c06c41adaf55a73928ea86d77d147d58a8e0f1ec1ec33ce085a2ebcad6a2f5",
+    "results/manifests/v4-dev.completion.json": "8d870ce4fb0d995baa9e88c3ed52050c0d8f2d3da14696505f71062ee49623f4",
+    "results/manifests/v4-dev.manifest.json": "a25cb4fdf7a2b9441f3a2e59fbe4c0623075c203bbfa6d83fd37ac6692d94fa3",
+    "results/manifests/v4-heldout.completion.json": "ee8e78ba22194aa600aa6ad14008729bd4f208f1139f9d02090651d394e50d96",
+    "results/manifests/v4-heldout.manifest.json": "b21a47330d6ce472199e5fa341774ced37d25a77affb5650352bf226a84daa90"
   }
 }
