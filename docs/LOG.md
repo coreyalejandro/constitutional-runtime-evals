@@ -53,3 +53,13 @@ Every decision, run and deviation, newest last. Times UTC.
 - Prepaid balance: $40, with auto-reload off, as supplied in Corey's Phase C instructions; account settings were not independently inspected by Codex.
 - Run both pilots and project all required call kinds before the registered held-out and BID stages; development replication is optional if budget remains.
 - Stop and report any STOP output. Do not edit run code during execution.
+
+## 2026-10-20 — owner-approved cap increase after pilot projection
+
+- Recorded: 2026-10-20T02:01:09.773819-04:00.
+- Pilot spend: $0.275193.
+- Pilot projection including spend already incurred: $47.93 required ($47.65 for required stages).
+- Owner raised the shared cap from $36 to $55 after reviewing the pilot projection.
+- Owner reports prepaid balance now $59, with auto-reload off; account settings were not independently inspected by Codex.
+- Second judge remains claude-opus-5-5.
+- Continue Phase C from step 3 with MAX_USD=55; stop and report any STOP output.
