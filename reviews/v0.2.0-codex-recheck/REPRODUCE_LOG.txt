@@ -1,0 +1,69 @@
+python3.13 -m venv .venv
+.venv/bin/pip install -q -r requirements.txt
+.venv/bin/python -m pytest -q -p no:cacheprovider tests --junitxml=results/junit.xml
+...................................                                      [100%]
+35 passed in 3.05s
+.venv/bin/python -m analysis.reanalyze_april
+April re-analysis: baseline 10/50 vs constitution 0/50, exact McNemar p=0.002
+rm -rf runs_private/smoke runs_private/smoke-bid results/smoke
+.venv/bin/python -m evals.run_constitutional --name smoke --targets fake-target --judges fake-judge,fake-judge-2 --samples 2 --limit 4 --ledger runs_private/smoke/SPEND.jsonl
+[1/3] responses: pass 1, 48 item(s)
+  [1/3] responses: 48/48
+[2/3] judgments: pass 1, 384 item(s)
+  [2/3] judgments: 50/384
+  [2/3] judgments: 100/384
+  [2/3] judgments: 150/384
+  [2/3] judgments: 200/384
+  [2/3] judgments: 250/384
+  [2/3] judgments: 300/384
+  [2/3] judgments: 350/384
+  [2/3] judgments: 384/384
+[3/3] probes: pass 1, 80 item(s)
+  [3/3] probes: 50/80
+  [3/3] probes: 80/80
+Done. Complete: responses 48/48, judgments 384/384, probes 80/80. Shared ledger spend $0.00. Raw outputs in runs_private/smoke/
+.venv/bin/python -m analysis.analyze_constitutional --run runs_private/smoke --out results/smoke/constitutional
+{"primary_judge": "fake-judge", "target": "fake-target", "split": "dev", "violation_rate": {"baseline": 1.0, "generic_safety": 1.0, "constitution": 1.0}, "H1": {"comparison": "baseline minus constitution", "n_prompts": 4, "rate_first": 1.0, "rate_second": 1.0, "mean_difference": 0.0, "diff_95ci": [0.0, 0.0], "perm_p_raw": 1.0, "holm_p_raw": 1.0, "perm_p_two_sided": 1.0, "holm_p": 1.0, "evaluable": true}}
+{"primary_judge": "fake-judge", "target": "fake-target", "split": "heldout", "violation_rate": {"baseline": 0.75, "generic_safety": 1.0, "constitution": 1.0}, "H1": {"comparison": "baseline minus constitution", "n_prompts": 4, "rate_first": 0.75, "rate_second": 1.0, "mean_difference": -0.25, "diff_95ci": [-0.75, 0.0], "perm_p_raw": 1.0, "holm_p_raw": 1.0, "perm_p_two_sided": 1.0, "holm_p": 1.0, "evaluable": true}}
+.venv/bin/python -m evals.run_bid_cot --name smoke-bid --targets fake-target --judges fake-judge,fake-judge-2 --limit 4 --ledger runs_private/smoke/SPEND.jsonl
+[1/2] answers: pass 1, 24 item(s)
+  [1/2] answers: 24/24
+[2/2] judging: pass 1, 128 item(s)
+  [2/2] judging: 50/128
+  [2/2] judging: 100/128
+  [2/2] judging: 128/128
+Done. Complete: answers 24/24, scores 128/128. Shared ledger spend $0.00. Raw outputs in runs_private/smoke-bid/
+.venv/bin/python -m analysis.analyze_bid_cot --run runs_private/smoke-bid --out results/smoke/bid_cot
+{
+ "fake-judge": {
+  "fake-target": {
+   "bid_minus_cot": 0,
+   "diff_95ci": [
+    -1.25,
+    1.0
+   ],
+   "perm_p_raw": 1.0,
+   "n_questions": 4,
+   "role": "primary",
+   "perm_p_two_sided": 1.0,
+   "holm_p": null
+  }
+ },
+ "fake-judge-2": {
+  "fake-target": {
+   "bid_minus_cot": 0.25,
+   "diff_95ci": [
+    -0.75,
+    1.5
+   ],
+   "perm_p_raw": 1.0,
+   "n_questions": 4,
+   "role": "primary",
+   "perm_p_two_sided": 1.0,
+   "holm_p": null
+  }
+ }
+}
+rm -rf runs_private/smoke-bid
+.venv/bin/python scripts/provenance.py > results/PROVENANCE.json
+Done. April re-analysis: results/APRIL_REANALYSIS.md. Pipeline smoke test (fake model): results/smoke/.

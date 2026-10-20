@@ -170,3 +170,98 @@ def test_B8_sanitize(monkeypatch):
 def test_B9_holm_precision():
     p = 501 / 20001
     assert holm({"a": p, "b": p})["b"] > 0.05
+
+
+# ---------------- Amendment 2: re-check of v0.2.0 (reviews/v0.2.0-codex-recheck/RECHECK.md) ----------------
+
+# A1 re-check: the input reservation is a byte bound, and any overrun stops all further calls (fail closed)
+def test_A1r_input_bound_covers_schema_and_bytes():
+    from evals.common import INPUT_OVERHEAD_TOKENS, input_token_bound
+    schema = {"type": "object", "properties": {"score": {"type": "integer"}}}
+    n = input_token_bound("système", "ü" * 10, schema)
+    assert n == len("système".encode()) + 20 + len(json.dumps(schema, sort_keys=True).encode()) + INPUT_OVERHEAD_TOKENS
+
+
+def test_A1r_overrun_halts_ledger(tmp_path):
+    b = Budget(1.0, str(tmp_path / "s.jsonl"))
+    rid, usd = b.reserve("claude-haiku-4-5", 1, 1, "t", "response")
+    b.settle(rid, usd, "claude-haiku-4-5", Completion("x", "end_turn", 100000, 10), "t", "response")
+    assert b.overruns()
+    with pytest.raises(BudgetExceeded):
+        b.reserve("claude-haiku-4-5", 1, 1, "t")
+
+
+# A2 re-check: code changes and ledger changes/resets are refused on resume
+def _small(tmp_path, name, ledger):
+    return ["--name", name, "--outroot", str(tmp_path), "--ledger", str(ledger), "--targets", "fake-target", "--judges", "fake-judge",
+            "--limit", "1", "--splits", "heldout", "--samples", "1", "--no-probes"]
+
+
+def test_A2r_code_change_refused(tmp_path, monkeypatch):
+    run_constitutional.main(_small(tmp_path, "r", tmp_path / "L.jsonl"))
+    monkeypatch.setattr(common, "code_sha256", lambda: "0" * 64)
+    with pytest.raises(SystemExit) as e:
+        run_constitutional.main(_small(tmp_path, "r", tmp_path / "L.jsonl"))
+    assert "code_sha256" in str(e.value)
+
+
+def test_A2r_other_ledger_refused(tmp_path):
+    run_constitutional.main(_small(tmp_path, "r", tmp_path / "L.jsonl"))
+    with pytest.raises(SystemExit) as e:
+        run_constitutional.main(_small(tmp_path, "r", tmp_path / "other.jsonl"))
+    assert "ledger" in str(e.value)
+
+
+def test_A2r_reset_ledger_refused(tmp_path):
+    led = tmp_path / "L.jsonl"
+    run_constitutional.main(_small(tmp_path, "r", led))
+    led.write_text("")  # same path, history wiped
+    with pytest.raises(SystemExit) as e:
+        run_constitutional.main(_small(tmp_path, "r", led))
+    assert "reset" in str(e.value)
+
+
+# A3 re-check: H3 is NOT EVALUATED when more than 5% of the benign helpfulness judgments it needs are missing
+def test_A3r_H3_missingness_gate(tmp_path):
+    run_constitutional.main(args_for(tmp_path, "h", "--targets", "fake-target", "--judges", "fake-judge", "--splits", "heldout",
+                                     "--samples", "1", "--conditions", "baseline,constitution", "--no-probes"))
+    d = tmp_path / "h"
+    resp = {r["key"]: r for r in load_jsonl(d / "responses.jsonl")}
+    js = load_jsonl(d / "judgments.jsonl")
+    benign_c = next(k for k, r in resp.items() if r["condition"] == "constitution" and not r["prompt_risks"])
+    js = [j for j in js if not (j["response_key"] == benign_c and j["principle"] == "Contract_Helpful_Harmless")]
+    with open(d / "judgments.jsonl", "w") as f:
+        for j in js:
+            f.write(json.dumps(j) + "\n")
+    out = tmp_path / "o"
+    analyze_constitutional.main(["--run", str(d), "--out", str(out)])
+    h3 = json.load(open(out / "analysis.json"))["by_judge"]["fake-judge"]["targets"]["fake-target"]["heldout"]["H3_overrefusal_noninferiority"]
+    benign = h3["missingness"]["constitution"]["expected"]
+    assert benign <= 19  # one missing of <=19 benign prompts is > 5%
+    assert h3["evaluable"] is False and h3["noninferior"] is None and "NOT EVALUATED" in h3["note"]
+
+
+# Pilot re-check: projection is per call kind and refuses to project an unmeasured kind
+def test_pilot_projection_needs_every_kind(tmp_path):
+    import subprocess, sys
+    led = tmp_path / "L.jsonl"
+    b = Budget(10, str(led))
+    for kind in ("response", "judgment"):
+        for m in ("claude-haiku-4-5", "claude-sonnet-4-6"):
+            rid, usd = b.reserve(m, 10, 10, "pilot", kind)
+            b.settle(rid, usd, m, Completion("x", "end_turn", 5, 5), "pilot", kind)
+    r = subprocess.run([sys.executable, "scripts/project_cost.py", "--ledger", str(led), "--target", "claude-haiku-4-5",
+                        "--judges", "claude-sonnet-4-6"], capture_output=True, text=True)
+    assert r.returncode == 5 and "answer" in r.stdout and "pairwise" in r.stdout
+
+
+# A4 strengthened: the full analyzer reports question-level wins (not only the sign test helper)
+def test_A4_full_analyzer_question_unit(tmp_path):
+    from analysis import analyze_bid_cot
+    from evals import run_bid_cot
+    run_bid_cot.main(args_for(tmp_path, "b", "--targets", "fake-target", "--judges", "fake-judge", "--limit", "2"))
+    out = tmp_path / "bo"
+    analyze_bid_cot.main(["--run", str(tmp_path / "b"), "--out", str(out)])
+    pw = json.load(open(out / "analysis.json"))["by_judge"]["fake-judge"]["targets"]["fake-target"]["pairwise"]
+    assert pw["unit"] == "question" and pw["questions_judged"] == 2
+    assert pw["bid_win_questions"] + pw["cot_win_questions"] + pw["tied_questions"] == 2

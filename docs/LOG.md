@@ -34,3 +34,12 @@ Every decision, run and deviation, newest last. Times UTC.
   stays in the archive manifest. The same text is still public in the-living-constitution repository; that is the
   owner's decision.
 - 35 offline tests pass, including 15 regression tests named after the review findings.
+
+## 2026-10-20 — v0.2.1: Codex re-check and Amendment 2 (Claude, for Corey Alejandro)
+- Codex re-ran its review against v0.2.0 with fake providers only: A4–A7 FIXED, A1–A3 PARTLY FIXED, one new issue in the
+  cost projection; NO-GO. Published unedited in `reviews/v0.2.0-codex-recheck/`.
+- Fixed all four: byte-bounded input reservation plus fail-closed overrun halt (A1); code hash, ledger path and
+  reset-ledger detection in the resume check (A2); missing-data gate for H3 (A3); BID pilot and a per-kind, max-cost
+  projection (new). Recorded as Amendment 2 before any paid data.
+- Codex's own re-check harness now reports the overrun stop and refuses the ledger change it previously showed accepted.
+- 43 offline tests pass (8 new, named after the re-check findings).

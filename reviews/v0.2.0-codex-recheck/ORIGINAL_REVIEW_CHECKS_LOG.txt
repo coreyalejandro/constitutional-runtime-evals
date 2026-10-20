@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/coreyalejandro/Documents/Codex/2026-10-16/fi-2/work/constitutional-runtime-evals/reviews/v0.1.0-codex/review_checks.py", line 46, in <module>
+    record("T01_store_retry", {k: s.has(k) for k in ("transport", "parse", "success")})
+                                  ^^^^^
+AttributeError: 'Store' object has no attribute 'has'

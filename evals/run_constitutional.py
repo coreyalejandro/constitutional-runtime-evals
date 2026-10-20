@@ -112,21 +112,21 @@ def main(argv=None):
     resolved = resolve_models(targets + judges, pick)
     cfg = {**vars(a), "experiment": "constitutional_v4",
            "generic_safety_system": generic_safety_prompt("")[0], "judge_max_tokens_by_judge": {j: judge_max_tokens(j, a.judge_max_tokens) for j in judges}}
-    manifest(out, cfg, FINGERPRINT, provs, DATA, resolved)
     budget = Budget(a.max_usd, a.ledger)
+    manifest(out, cfg, FINGERPRINT, provs, DATA, resolved, budget, a.name)
     prompts = []
     for sp in splits:
         rows = load_jsonl(f"data/{sp}_prompts.jsonl")
         prompts += rows[: a.limit] if a.limit else rows
 
-    def call(model, system, user, max_tokens, temperature, schema=None):
-        rid, usd = budget.reserve(model, est_tokens(system, user), max_tokens, a.name)
+    def call(model, system, user, max_tokens, temperature, schema=None, kind=None):
+        rid, usd = budget.reserve(model, est_tokens(system, user, schema), max_tokens, a.name, kind)
         r = None
         try:
             r = pick[model].complete(resolved[model], system, user, max_tokens, temperature, schema)
             return r
         finally:
-            budget.settle(rid, usd, model, r, a.name)
+            budget.settle(rid, usd, model, r, a.name, kind)
 
     def passes(store, make_jobs, label):
         for p in range(MAX_ATTEMPTS):
@@ -145,7 +145,7 @@ def main(argv=None):
         if R.done(key):
             return
         system, user = CONDITIONS[c](p["prompt"])
-        r = call(t, system, user, a.max_tokens, a.temperature)
+        r = call(t, system, user, a.max_tokens, a.temperature, kind="response")
         R.add({"key": key, "status": "error" if r.error else "ok", "target": t, "model_snapshot": resolved[t], "condition": c,
                "prompt_id": p["id"], "split": p["split"], "sample": k, "prompt_risks": p["prompt_risks"], "query": p["prompt"],
                "response": r.text, "response_sha256": sha256_text(r.text), "stop_reason": r.stop_reason,
@@ -162,7 +162,7 @@ def main(argv=None):
         if J.done(key):
             return
         system, user = AP.build_judge_prompts(pr, resp["query"], resp["response"])
-        r = call(jm, system, user, judge_max_tokens(jm, a.judge_max_tokens), a.judge_temperature, AP.JUDGE_OUTPUT_SCHEMA)
+        r = call(jm, system, user, judge_max_tokens(jm, a.judge_max_tokens), a.judge_temperature, AP.JUDGE_OUTPUT_SCHEMA, kind="judgment")
         parsed, perr = (None, r.error) if r.error else parse_judgment(r.text)
         if r.stop_reason in TRUNCATED:
             parsed, perr = None, f"judge stop_reason={r.stop_reason}"
@@ -191,7 +191,7 @@ def main(argv=None):
             return
         pr = next(x for x in AP.CONSTITUTION if x["name"] == c["principle"])
         system, user = AP.build_judge_prompts(pr, c["prompt"], c["assistant_response"])
-        r = call(jm, system, user, judge_max_tokens(jm, a.judge_max_tokens), a.judge_temperature, AP.JUDGE_OUTPUT_SCHEMA)
+        r = call(jm, system, user, judge_max_tokens(jm, a.judge_max_tokens), a.judge_temperature, AP.JUDGE_OUTPUT_SCHEMA, kind="probe")
         parsed, perr = (None, r.error) if r.error else parse_judgment(r.text)
         if r.stop_reason in TRUNCATED:
             parsed, perr = None, f"judge stop_reason={r.stop_reason}"

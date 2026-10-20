@@ -55,7 +55,8 @@ need-judge2:
 
 pilot: need-judge2
 	$(BIN)/python -m evals.run_constitutional --name pilot --splits heldout --limit 1 --samples 1 --conditions baseline,constitution --no-probes --targets $(TARGET) --judges $(JUDGES) --require-judges 2 $(PAID) || true
-	$(BIN)/python scripts/project_cost.py --ledger $(LEDGER) --pilot-run pilot --target $(TARGET) --judges $(JUDGES) --cap $(MAX_USD)
+	$(BIN)/python -m evals.run_bid_cot --name pilot-bid --limit 1 --samples 1 --targets $(TARGET) --judges $(JUDGES) --require-judges 2 $(PAID) || true
+	$(BIN)/python scripts/project_cost.py --ledger $(LEDGER) --target $(TARGET) --judges $(JUDGES) --cap $(MAX_USD)
 
 run: pilot run-heldout run-bid run-dev analyze provenance
 
@@ -72,5 +73,5 @@ analyze:
 	$(BIN)/python -m analysis.analyze_constitutional --run runs_private/$(RUN)-heldout --out results/constitutional_v4/heldout
 	test -d runs_private/$(RUN)-dev && $(BIN)/python -m analysis.analyze_constitutional --run runs_private/$(RUN)-dev --out results/constitutional_v4/dev || echo "No dev replication to analyse."
 	$(BIN)/python -m analysis.analyze_bid_cot --run runs_private/$(RUN)-bid --out results/bid_cot_v2
-	mkdir -p results/manifests && for d in $(RUN)-heldout $(RUN)-dev $(RUN)-bid pilot; do test -d runs_private/$$d && cp runs_private/$$d/manifest.json results/manifests/$$d.manifest.json && cp runs_private/$$d/completion.json results/manifests/$$d.completion.json || true; done
+	mkdir -p results/manifests && for d in $(RUN)-heldout $(RUN)-dev $(RUN)-bid pilot pilot-bid; do test -d runs_private/$$d && cp runs_private/$$d/manifest.json results/manifests/$$d.manifest.json && cp runs_private/$$d/completion.json results/manifests/$$d.completion.json || true; done
 	cp $(LEDGER) results/manifests/SPEND.jsonl

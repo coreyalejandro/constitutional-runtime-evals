@@ -199,20 +199,20 @@ def main(argv=None):
     lock = RunLock(out)  # noqa: F841
     provs, pick = providers_for(targets + judges)
     resolved = resolve_models(targets + judges, pick)
-    manifest(out, {**vars(a), "experiment": "bid_vs_cot_v2", "conditions": "plain,cot,bid"}, FINGERPRINT, provs,
-             ["data/bid_cot_questions.jsonl"], resolved)
     budget = Budget(a.max_usd, a.ledger)
+    manifest(out, {**vars(a), "experiment": "bid_vs_cot_v2", "conditions": "plain,cot,bid"}, FINGERPRINT, provs,
+             ["data/bid_cot_questions.jsonl"], resolved, budget, a.name)
     Q = load_jsonl("data/bid_cot_questions.jsonl"); Q = Q[: a.limit] if a.limit else Q
     qmap = {q["id"]: q for q in Q}
 
-    def call(model, system, user, max_tokens, temperature, schema=None):
-        rid, usd = budget.reserve(model, est_tokens(system, user), max_tokens, a.name)
+    def call(model, system, user, max_tokens, temperature, schema=None, kind=None):
+        rid, usd = budget.reserve(model, est_tokens(system, user, schema), max_tokens, a.name, kind)
         r = None
         try:
             r = pick[model].complete(resolved[model], system, user, max_tokens, temperature, schema)
             return r
         finally:
-            budget.settle(rid, usd, model, r, a.name)
+            budget.settle(rid, usd, model, r, a.name, kind)
 
     def passes(make_jobs, label):
         for p in range(MAX_ATTEMPTS):
@@ -229,7 +229,7 @@ def main(argv=None):
         key = f"{t}|{c}|{q['id']}|{k}"
         if A.done(key):
             return
-        r = call(t, SYSTEM_ANSWER, CONDITIONS[c](q["question"]), a.max_tokens, a.temperature)
+        r = call(t, SYSTEM_ANSWER, CONDITIONS[c](q["question"]), a.max_tokens, a.temperature, kind="answer")
         A.add({"key": key, "status": "error" if r.error else "ok", "target": t, "model_snapshot": resolved[t], "condition": c,
                "qid": q["id"], "domain": q["domain"], "sample": k, "answer": r.text, "answer_sha256": sha256_text(r.text),
                "stop_reason": r.stop_reason, "output_tokens": r.output_tokens, "error": r.error, "sends": r.attempts,
@@ -246,7 +246,7 @@ def main(argv=None):
     def score(kind, jm, key, prompt, schema, keys, meta):
         if S.done(key):
             return
-        r = call(jm, SYSTEM_JUDGE, prompt, a.judge_max_tokens, a.judge_temperature, schema)
+        r = call(jm, SYSTEM_JUDGE, prompt, a.judge_max_tokens, a.judge_temperature, schema, kind=kind)
         parsed, perr = (None, r.error) if r.error else parse_json(r.text, keys)
         if parsed is not None and validate(kind, parsed, keys) is None:
             parsed, perr = None, "invalid value"

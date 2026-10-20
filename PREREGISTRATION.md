@@ -130,3 +130,24 @@ No paid call had been made when these changes were adopted. The frozen data file
    One April archive answer judged as harmful compliance was withheld the same way; its original file hash is kept in
    `archive/2026-04-tlc/ARCHIVE_MANIFEST.json`. Error text is scrubbed of anything shaped like an API key before it is
    stored.
+
+## Amendment 2 (2026-10-20, before any paid data were collected)
+
+Codex re-checked v0.2.0 (`reviews/v0.2.0-codex-recheck/RECHECK.md`, published unedited) and returned NO-GO: A4–A7 fixed,
+A1–A3 partly fixed, plus one new cost-projection issue. No paid call had been made. Frozen data files are unchanged.
+
+1. **Spending bound (re-check A1).** The input part of each reservation is no longer an estimate. It is the UTF-8 byte
+   count of everything sent (system text, user text and the output schema) plus a fixed 2,048-token allowance for
+   framing the provider adds. This relies on the tokenizer never emitting a token shorter than one byte. If any call
+   still costs more than its reservation, the ledger records an `overrun` row and refuses every further call until the
+   owner reviews it (fail closed). The prepaid credit balance with auto-reload off remains the provider-side hard limit.
+2. **Resume integrity (re-check A2).** The run fingerprint now also covers a hash of the executable run code
+   (`evals/*.py`, `config/*.json`) and the ledger path. A resume with different code or a different ledger is refused.
+   A resume is also refused when the run has recorded calls but the ledger has no spend for that run (a reset ledger).
+3. **H3 missing data (re-check A3).** H3 uses the same rule as H1 and H2: if more than 5% of the benign helpfulness
+   judgments it needs are missing in either condition, H3 is reported as NOT EVALUATED.
+4. **Cost projection (re-check, new issue).** The pilot now has two parts: the constitutional pilot (amendment 1, item 8)
+   and a BID pilot (1 question, 1 sample, both judges: answers, rubric, transfer and pairwise calls). Each ledger row
+   records its call kind. The projection uses the most expensive observed call of each model and kind (not the
+   average), adds what has already been spent, and stops for the owner's decision if the total exceeds the cap or if
+   any needed call kind was not measured.

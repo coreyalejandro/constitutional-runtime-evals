@@ -175,32 +175,61 @@ class Budget:
             f.flush()
             os.fsync(f.fileno())
 
-    def reserve(self, model, input_tokens_est, max_output_tokens, run):
+    def overruns(self):
+        return [r for r in self._ledger() if r.get("type") == "overrun"]
+
+    def reserve(self, model, input_tokens_bound, max_output_tokens, run, kind=None):
         p = price(model)
-        usd = (input_tokens_est * p["input"] + max_output_tokens * p["output"]) / 1e6
+        usd = (input_tokens_bound * p["input"] + max_output_tokens * p["output"]) / 1e6
         with self._plock():
+            if self.overruns():
+                raise BudgetExceeded("a past call cost more than its reservation (see 'overrun' rows in the ledger); "
+                                     "no new calls until the owner reviews it")
             committed = self.spent() + self._open_reserved()
             if committed + usd > self.max_usd:
                 raise BudgetExceeded(f"budget cap ${self.max_usd:.2f}: committed ${committed:.4f} + next call up to ${usd:.4f}")
             rid = hashlib.sha256(f"{now()}{threading.get_ident()}{os.getpid()}{model}{usd}{os.urandom(8).hex()}".encode()).hexdigest()[:16]
-            self._write({"type": "reserve", "rid": rid, "at": now(), "run": run, "model": model, "usd": round(usd, 6)})
+            self._write({"type": "reserve", "rid": rid, "at": now(), "run": run, "model": model, "kind": kind,
+                         "usd": round(usd, 6)})
         return rid, usd
 
-    def settle(self, rid, reserved_usd, model, completion, run):
+    def settle(self, rid, reserved_usd, model, completion, run, kind=None):
         p = price(model)
         with self._plock():
             if completion is None or (completion.error and completion.input_tokens == 0 and completion.output_tokens == 0):
-                self._write({"type": "charged_unknown", "rid": rid, "at": now(), "run": run, "model": model,
+                self._write({"type": "charged_unknown", "rid": rid, "at": now(), "run": run, "model": model, "kind": kind,
                              "usd": round(reserved_usd, 6), "note": "outcome unknown or failed; charged the full reservation"})
             else:
                 usd = (completion.input_tokens * p["input"] + completion.output_tokens * p["output"]) / 1e6
-                self._write({"type": "settled", "rid": rid, "at": now(), "run": run, "model": model,
+                self._write({"type": "settled", "rid": rid, "at": now(), "run": run, "model": model, "kind": kind,
                              "in": completion.input_tokens, "out": completion.output_tokens, "usd": round(usd, 6)})
+                if usd > reserved_usd + 1e-12:
+                    self._write({"type": "overrun", "rid": rid, "at": now(), "run": run, "model": model, "kind": kind,
+                                 "reserved_usd": round(reserved_usd, 6), "actual_usd": round(usd, 6)})
+                    print(f"STOP: a {model} call cost ${usd:.6f}, more than its ${reserved_usd:.6f} reservation. "
+                          f"No new calls will start.", file=sys.stderr, flush=True)
+
+    def run_has_spend(self, run):
+        return any(r.get("run") == run for r in self._ledger())
 
 
-def est_tokens(*texts):
-    """Conservative input-token estimate: 1 token per 3 characters, plus overhead."""
-    return sum(len(t or "") for t in texts) // 3 + 64
+INPUT_OVERHEAD_TOKENS = 2048  # message framing + structured-output scaffolding the provider adds (Amendment 2)
+
+
+def input_token_bound(*parts):
+    """Worst-case input tokens (Amendment 2, review A1-recheck). Byte-level tokenizers never emit a token shorter than
+    one byte, so the UTF-8 byte count of everything sent (system, user, output schema) bounds the token count; a fixed
+    allowance covers framing the provider adds. If a call ever uses more than its reservation, settle() records an
+    overrun and the ledger refuses all further calls until the owner decides (fail closed)."""
+    n = 0
+    for t in parts:
+        if t is None:
+            continue
+        n += len((t if isinstance(t, str) else json.dumps(t, sort_keys=True)).encode("utf-8"))
+    return n + INPUT_OVERHEAD_TOKENS
+
+
+est_tokens = input_token_bound  # backward-compatible name
 
 
 def run_parallel(jobs, workers, label):
@@ -246,20 +275,43 @@ def _version(md, pkg):
         return None
 
 
-def manifest(outdir, cfg, fingerprint_fields, providers, data_files, resolved_models):
-    """Write manifest.json once. Later invocations must match its fingerprint, or the run is refused."""
+CODE_DIRS = ("evals", "config")
+
+
+def code_sha256():
+    """Hash of the executable run code and config (evals/*.py, config/*). Amendment 2: a resume with different code is refused."""
+    root = os.path.join(os.path.dirname(__file__), "..")
+    h = hashlib.sha256()
+    for d in CODE_DIRS:
+        for f in sorted(os.listdir(os.path.join(root, d))):
+            fp = os.path.join(root, d, f)
+            if os.path.isfile(fp) and (f.endswith(".py") or f.endswith(".json")):
+                h.update(f"{d}/{f}".encode()); h.update(open(fp, "rb").read())
+    return h.hexdigest()
+
+
+def manifest(outdir, cfg, fingerprint_fields, providers, data_files, resolved_models, budget=None, run_name=None):
+    """Write manifest.json once. Later invocations must match its fingerprint, or the run is refused.
+    The fingerprint covers settings, data hashes, resolved snapshots, prices, the run code hash and the ledger path."""
     import importlib.metadata as md
     data = {f: sha256_file(f) for f in data_files}
     fp_src = {"config": {k: cfg[k] for k in fingerprint_fields}, "data_sha256": data, "resolved_models": resolved_models,
-              "pricing": {m: price(m) for m in resolved_models}}
+              "pricing": {m: price(m) for m in resolved_models}, "code_sha256": code_sha256(),
+              "ledger": os.path.relpath(os.path.realpath(budget.path)) if budget else None}
     fingerprint = hashlib.sha256(json.dumps(fp_src, sort_keys=True).encode()).hexdigest()
     path = os.path.join(outdir, "manifest.json")
     inv = {"at": now(), "git_head": git_head(), "python": sys.version.split()[0], "argv": sys.argv[1:]}
     if os.path.exists(path):
         old = json.load(open(path))
         if old.get("fingerprint") != fingerprint:
-            raise SystemExit(f"Refusing to resume {outdir}: settings, data, model snapshots or prices differ from the original run "
+            changed = [k for k in fp_src if old.get(k) != fp_src[k]] if all(k in old for k in fp_src) else ["(older manifest format)"]
+            raise SystemExit(f"Refusing to resume {outdir}: {', '.join(changed)} differ(s) from the original run "
                              f"(fingerprint {old.get('fingerprint', '')[:12]} vs {fingerprint[:12]}). Use a new --name.")
+        made_calls = any(os.path.getsize(os.path.join(outdir, f)) > 0 for f in os.listdir(outdir)
+                         if f.endswith(".jsonl") and f != "invocations.jsonl")
+        if budget is not None and made_calls and not budget.run_has_spend(run_name):
+            raise SystemExit(f"Refusing to resume {outdir}: it has recorded calls but the ledger {budget.path} has no spend rows for "
+                             f"run '{run_name}'. The ledger looks reset or replaced, so earlier spend would escape the cap.")
         m = old
     else:
         m = {"created_utc": now(), "git_head": git_head(), "fingerprint": fingerprint, **fp_src, "config_full": cfg,

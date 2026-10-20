@@ -18,6 +18,7 @@ Part of Corey Alejandro's research on Epistemic Safety and constitutional runtim
 | Pre-registration of v4 and BID vs CoT v2 | frozen before data | [`PREREGISTRATION.md`](PREREGISTRATION.md) |
 | v4 harness and BID vs CoT v2 harness | built and tested (fake model) | `evals/`, `analysis/`, `tests/` |
 | Independent review of v0.1.0 (OpenAI Codex): NO-GO, 7 blocking issues | all 7 fixed in v0.2.0; regression tests added | [`reviews/v0.1.0-codex/`](reviews/v0.1.0-codex/INDEPENDENT_REVIEW.md), [Amendment 1](PREREGISTRATION.md) |
+| Codex re-check of v0.2.0: NO-GO, 3 partly fixed + 1 new issue | all 4 fixed in v0.2.1; regression tests added | [`reviews/v0.2.0-codex-recheck/`](reviews/v0.2.0-codex-recheck/RECHECK.md), [Amendment 2](PREREGISTRATION.md) |
 | v4 and v2 paid runs | **not yet run** | `results/constitutional_v4/`, `results/bid_cot_v2/` |
 
 ## What April showed (honestly)
