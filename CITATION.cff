@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
 title: "Constitutional Runtime Evals: Does a Stated Constitution Change Model Behavior, and Does Backward Design Beat Chain of Thought?"
-version: 0.2.1
+version: 0.3.1
 date-released: 2026-10-19
 authors:
   - family-names: Alejandro

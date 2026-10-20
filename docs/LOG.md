@@ -63,3 +63,10 @@ Every decision, run and deviation, newest last. Times UTC.
 - Owner reports prepaid balance now $59, with auto-reload off; account settings were not independently inspected by Codex.
 - Second judge remains claude-opus-5-5.
 - Continue Phase C from step 3 with MAX_USD=55; stop and report any STOP output.
+
+## 2026-10-20 — results verified and written up (Claude, for Corey Alejandro)
+- Claude cloned tag v0.3.0 from GitHub and checked the committed analysis files and spend ledger: $36.467971 settled,
+  0 overrun rows, 0 charged_unknown rows; heldout 3,571/3,600 judgments and 74/80 probes; dev 596/600 and 39/40;
+  BID complete (180/180 answers, 960/960 scores). Every hypothesis is under the 5% missing-data gate.
+- Wrote the plain summary in RESULTS.md and updated the README status. H1, H2 and H3 supported under both judges;
+  H-B1 not supported. No analysis code or result file was changed.
