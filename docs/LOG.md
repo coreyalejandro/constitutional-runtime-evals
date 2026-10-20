@@ -43,3 +43,13 @@ Every decision, run and deviation, newest last. Times UTC.
   projection (new). Recorded as Amendment 2 before any paid data.
 - Codex's own re-check harness now reports the overrun stop and refuses the ledger change it previously showed accepted.
 - 43 offline tests pass (8 new, named after the re-check findings).
+
+## 2026-10-20 — run plan (Codex for Corey)
+
+- Recorded UTC: 2026-10-20T05:37:27+00:00.
+- Second judge: claude-opus-5-5.
+- Selection rule output: second judge: claude-opus-5-5 [anthropic (same family as the primary judge)].
+- One shared cap: $36 across the pilots and registered stages.
+- Prepaid balance: $40, with auto-reload off, as supplied in Corey's Phase C instructions; account settings were not independently inspected by Codex.
+- Run both pilots and project all required call kinds before the registered held-out and BID stages; development replication is optional if budget remains.
+- Stop and report any STOP output. Do not edit run code during execution.
