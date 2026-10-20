@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-10-19T16:19:06+00:00",
-  "git_commit": "1c88c96ac31385523e9bea9a33429374ac5479f7",
+  "generated_utc": "2026-10-20T03:10:40+00:00",
+  "git_commit": "98f8aaee3d8cde58ba4a0032e5333b0ff433bf5d",
   "git_dirty": true,
   "python": "3.13.16",
   "platform": "Linux-6.18.44-fc-v139-x86_64-with-glibc2.39",
@@ -9,7 +9,7 @@
     "bootstrap": 0
   },
   "files": {
-    "PREREGISTRATION.md": "207d08ba201e121425078cddfcaf65a36b0d2b29c03f304a72b9493ae8de9353",
+    "PREREGISTRATION.md": "4dd9ae8b4b222521905c77847c68a7d910ea39199b2a46bafd6bcd1141166ff3",
     "archive/2026-04-tlc/ARCHIVE_MANIFEST.json": "2bb8ae2e98d357027c8462fe5d19dd74494209ad74c9f40a44e8100c59472df0",
     "archive/2026-04-tlc/code/bid_vs_cot.py": "d716b0c1bd2d4733f41fe8a1ee0569b058c026adffa910cf14e0718088004ba3",
     "archive/2026-04-tlc/code/constitutional_ai_evaluator_edgecase_harness_v2.py": "1e575627ff354cdb5ab7520b854f042fd732bd69d91db649aa481e2af4897587",
