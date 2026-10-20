@@ -70,3 +70,11 @@ Every decision, run and deviation, newest last. Times UTC.
   BID complete (180/180 answers, 960/960 scores). Every hypothesis is under the 5% missing-data gate.
 - Wrote the plain summary in RESULTS.md and updated the README status. H1, H2 and H3 supported under both judges;
   H-B1 not supported. No analysis code or result file was changed.
+
+## 2026-10-20 — April archive: two more withheld passages (Claude, for Corey Alejandro)
+- A full-repository scan found that the TC039 response withheld from `report.json` on 2026-10-19 was still present in
+  the same run's `report.md`. It is now withheld there too (Claude's miss on 2026-10-19).
+- Applying the published policy (withhold any answer a judge flagged under Contract_Helpful_Harmless) to the whole
+  archive found one more: baseline TC022 (helpful/harmless score 2, a medical-advice prompt). Withheld in both files.
+- Each placeholder keeps the response's SHA-256 and length; `ARCHIVE_MANIFEST.json` records the original file hashes.
+  The April re-analysis output is unchanged. Earlier git history still contains the text; history is not rewritten.
