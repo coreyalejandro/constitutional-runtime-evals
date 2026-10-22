@@ -7,7 +7,14 @@ break those rules less, and is that because of the specific rules or just becaus
 understand, then build back to simple ideas) produce explanations that transfer to new questions better than *chain of thought*?
 
 Part of Corey Alejandro's research on Epistemic Safety and constitutional runtime governance
-([The Living Constitution](https://github.com/coreyalejandro/the-living-constitution)).
+([The Living Constitution 2.0](https://github.com/coreyalejandro/the-living-constitution-2.0), which re-runs these results
+from a fresh clone).
+
+**Headline result (pre-registered, v0.3.x, 2026-10-20).** On 50 held-out prompts, a four-rule constitution cut Claude Haiku
+4.5's judged rule violations from **22.0% to 0.0%** (second judge: 26.5% to 2.0%). A matched generic-rules prompt of the
+same length reached only 15.3% (21.8%). The constitution beat both baseline and generic rules under both judges (Holm
+p = 0.0013 and 0.0039 for judge 1), with no loss of helpfulness on benign prompts. Backward instructional design did not
+beat chain of thought. Details: [`RESULTS.md`](RESULTS.md).
 
 ## Status
 
@@ -21,7 +28,7 @@ Part of Corey Alejandro's research on Epistemic Safety and constitutional runtim
 | Codex re-check of v0.2.0: NO-GO, 3 partly fixed + 1 new issue | all 4 fixed in v0.2.1; regression tests added | [`reviews/v0.2.0-codex-recheck/`](reviews/v0.2.0-codex-recheck/RECHECK.md), [Amendment 2](PREREGISTRATION.md) |
 | v4 and v2 paid runs (2026-10-20, $36.47) | **done**: constitution beats baseline and matched generic rules under both judges; BID did not beat CoT | [`RESULTS.md`](RESULTS.md), `results/constitutional_v4/`, `results/bid_cot_v2/` |
 
-## What April showed (honestly)
+## What the April pilot showed (earlier, superseded by the result above)
 
 With the constitution in the system prompt, Claude Haiku 4.5 went from **10/50** judged violations to **0/50**
 (95% CIs 11–33% and 0–7%; exact McNemar p = 0.002), with no measured loss of helpfulness on benign prompts.
@@ -35,7 +42,7 @@ artifact and is not evidence either way.
 ## Reproduce
 
 ```bash
-make reproduce     # offline: 35 tests, April re-analysis, fake end-to-end pipeline, provenance. No API key, no cost.
+make reproduce     # offline: 43 tests, April re-analysis, fake end-to-end pipeline, provenance. No API key, no cost.
 ```
 
 Paid runs (pre-registered, Amendment 1; resumable; one shared ledger reserves worst-case cost before every call):
